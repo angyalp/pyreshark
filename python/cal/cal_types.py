@@ -109,7 +109,7 @@ class ProtocolBase(object):
         self.items_dict = {}
         
         self._proto_index = c_int(cal.wslib.proto_register_protocol(self._name, self._short_name, self._filter_name))
-        cal.wslib.register_dissector(self._filter_name, cal.pslib.dissect_pyreshark, self._proto_index)
+        cal.wslib.new_register_dissector(self._filter_name, cal.pslib.dissect_pyreshark, self._proto_index)
         
         self._top_item = GeneralItem(pointer(self._proto_index), self._filter_name)
         self._top_tree = Subtree(self._top_item, self._items, TOP_TREE)
@@ -141,7 +141,7 @@ class ProtocolBase(object):
         @summary: Register the protocol in a dissection table according to the member _register_under
         '''
         if hasattr(self, "_register_under"):
-            handle = self._cal.wslib.create_dissector_handle(self._cal.pslib.dissect_pyreshark, self._proto_index)
+            handle = self._cal.wslib.new_create_dissector_handle(self._cal.pslib.dissect_pyreshark, self._proto_index)
             for table, value in self._register_under.iteritems():
                 if type(value) == int:
                     self._cal.wslib.dissector_add_uint(table, value, handle)

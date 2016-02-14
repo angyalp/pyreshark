@@ -119,12 +119,14 @@ void handoff_pyreshark(void);
     Pyreshark's dissection function shared between all python protocols.
     It determines which protocol should be dissected and calls 'dissect_proto'
 */
-WS_DLL_PUBLIC void dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree);
+  WS_DLL_PUBLIC int dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data);
 
 /** 
     Goes through the protocol's dissection chain and calls the dissection functions.
 */
-void dissect_proto(py_dissector_t * dissector_array, tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree);
+  int dissect_proto(py_dissector_t * dissector_array, tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree);
+
+  int dissect_proto_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data);
 
 /*****************************************/
 /*                                       */

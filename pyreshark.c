@@ -130,8 +130,15 @@ handoff_pyreshark(void)
     }
 }
 
-void
-dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+guint get_message_len(packet_info *pinfo, tvbuff_t *tvb, int offset, void *data)
+{
+  guint length = tvb_get_ntohs(tvb, offset);
+
+  return length;
+}
+
+int
+dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data)
 {
     int i;
 
@@ -139,8 +146,18 @@ dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     {
         if (strcmp(g_dissectors[i]->name, pinfo->current_proto) == 0)
         {
-            dissect_proto(g_dissectors[i], tvb, pinfo, tree);
-            return;
+	  if (1) // TODO: Get this from the protocol
+	  {
+	    tcp_dissect_pdus(tvb, pinfo, tree, TRUE,
+			     8, // TODO: Get this from the protocol
+			     get_message_len, // TODO: Get this from the protocol
+			     dissect_proto_message, data);
+	    return tvb_captured_length(tvb);
+	  }
+	  else
+	  {
+	    return dissect_proto(g_dissectors[i], tvb, pinfo, tree);
+	  }
         }
     }
 
@@ -155,9 +172,26 @@ dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
                     pinfo->current_proto);
 #endif
     }
+    return tvb_captured_length(tvb);
 }
 
-void
+int
+dissect_proto_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data)
+{
+    int i;
+
+    for (i=0;i<g_num_dissectors; i++)
+    {
+        if (strcmp(g_dissectors[i]->name, pinfo->current_proto) == 0)
+        {
+	    return dissect_proto(g_dissectors[i], tvb, pinfo, tree);
+        }
+    }
+
+    return tvb_captured_length(tvb);
+}
+
+int
 dissect_proto(py_dissector_t *py_dissector, tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {
     int i;
@@ -168,6 +202,8 @@ dissect_proto(py_dissector_t *py_dissector, tvbuff_t *tvb, packet_info *pinfo, p
     {
         py_dissector->dissection_chain[i]->func(&tvb_and_tree, pinfo, &offset, py_dissector->dissection_chain[i]->params);
     }
+
+    return tvb_reported_length(tvb);
 }
 
 
