@@ -235,6 +235,13 @@ class DissectorItem(ItemBase):
         self._dissector_name.value = name
         self._length.value = length
     
+    def set_length(self, length):
+        '''
+        @summary: Changes how many bytes to dissect next time this item is invoked.
+        @param length: The number of bytes to be dissected.
+        '''
+        self._length.value = length
+
     def get_node_list(self):
         '''
         @summary: See ItemBase
