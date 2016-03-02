@@ -146,18 +146,18 @@ dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
     {
         if (strcmp(g_dissectors[i]->name, pinfo->current_proto) == 0)
         {
-	  if (1) // TODO: Get this from the protocol
-	  {
-	    tcp_dissect_pdus(tvb, pinfo, tree, TRUE,
-			     8, // TODO: Get this from the protocol
-			     get_message_len, // TODO: Get this from the protocol
-			     dissect_proto_message, data);
-	    return tvb_captured_length(tvb);
-	  }
-	  else
-	  {
-	    return dissect_proto(g_dissectors[i], tvb, pinfo, tree);
-	  }
+	        if (strcmp(g_dissectors[i]->name, "PDS") != 0) // TODO: Get this from the protocol
+	        {
+	            tcp_dissect_pdus(tvb, pinfo, tree, TRUE,
+			                     8, // TODO: Get this from the protocol
+			                     get_message_len, // TODO: Get this from the protocol
+			                     dissect_proto_message, data);
+	            return tvb_captured_length(tvb);
+	        }
+	        else
+	        {
+	            return dissect_proto(g_dissectors[i], tvb, pinfo, tree);
+	        }
         }
     }
 
