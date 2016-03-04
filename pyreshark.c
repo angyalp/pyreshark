@@ -146,7 +146,7 @@ dissect_pyreshark(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
     {
         if (strcmp(g_dissectors[i]->name, pinfo->current_proto) == 0)
         {
-	        if (strcmp(g_dissectors[i]->name, "PDS") != 0) // TODO: Get this from the protocol
+	        if (strcmp(g_dissectors[i]->name, "TCPVLS") == 0) // TODO: Get this from the protocol
 	        {
 	            tcp_dissect_pdus(tvb, pinfo, tree, TRUE,
 			                     8, // TODO: Get this from the protocol
